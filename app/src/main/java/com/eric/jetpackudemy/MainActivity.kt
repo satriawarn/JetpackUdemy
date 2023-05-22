@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -55,19 +56,24 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen() {
+fun MainScreen(userProfiles: List<UserProfile> = userProfileList) {
     Scaffold(topBar = { AppBar() }) {
         Surface(
-            modifier = Modifier.fillMaxSize().padding(it),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it),
             color = Color.LightGray
         ) {
-            ProfileCard()
+            Column {
+                for (userProfile in userProfiles)
+                    ProfileCard(userProfile)
+            }
         }
     }
 }
 
 @Composable
-fun AppBar(){
+fun AppBar() {
     TopAppBar(
         title = { Text("Jetpack Application") },
         navigationIcon = {
@@ -79,10 +85,11 @@ fun AppBar(){
 }
 
 @Composable
-fun ProfileCard() {
+fun ProfileCard(userProfile: UserProfile) {
     Card(
+        shape = CutCornerShape(topEnd = 20.dp),
         modifier = Modifier
-            .padding(16.dp)
+            .padding(top = 8.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -93,22 +100,22 @@ fun ProfileCard() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            ProfilePicture()
-            ProfileContent()
+            ProfilePicture(userProfile.drawableId, userProfile.status)
+            ProfileContent(userProfile.name, userProfile.status)
         }
     }
 }
 
 @Composable
-fun ProfilePicture() {
+fun ProfilePicture(drawableId: Int, status: Boolean) {
     Card(
         shape = CircleShape,
-        border = BorderStroke(width = 2.dp, color = Color.Green),
+        border = BorderStroke(width = 2.dp, color = if (status) Color.Green else Color.Red),
         modifier = Modifier.padding(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.unicorn),
+            painter = painterResource(id = drawableId),
             contentDescription = "blablalba",
             modifier = Modifier.size(72.dp),
             contentScale = ContentScale.Crop
@@ -118,15 +125,18 @@ fun ProfilePicture() {
 }
 
 @Composable
-fun ProfileContent() {
+fun ProfileContent(name: String, status: Boolean) {
     Column(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
     ) {
-        Text(text = "John Doe", style = MaterialTheme.typography.headlineMedium)
+        Text(text = name, style = MaterialTheme.typography.headlineMedium)
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            Text(text = "Active now", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = if (status) "Active now" else "Offline",
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
