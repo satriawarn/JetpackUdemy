@@ -7,7 +7,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eric.jetpackudemy.ui.theme.JetpackUdemyTheme
@@ -44,16 +42,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.TopAppBar
+import androidx.compose.ui.unit.Dp
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import org.jetbrains.annotations.Async
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             JetpackUdemyTheme() {
-                MainScreen()
+                UserListScreen()
             }
         }
     }
@@ -61,7 +58,7 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(userProfiles: List<UserProfile> = userProfileList) {
+fun UserListScreen(userProfiles: List<UserProfile> = userProfileList) {
     Scaffold(topBar = { AppBar() }) {
         Surface(
             modifier = Modifier
@@ -106,18 +103,18 @@ fun ProfileCard(userProfile: UserProfile) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            ProfilePicture(userProfile.pictureUrl, userProfile.status)
-            ProfileContent(userProfile.name, userProfile.status)
+            ProfilePicture(userProfile.pictureUrl, userProfile.status, 72.dp )
+            ProfileContent(userProfile.name, userProfile.status, Alignment.Start)
         }
     }
 }
 
 @Composable
-fun ProfilePicture(pictureUrl: String, status: Boolean) {
+fun ProfilePicture(pictureUrl: String, status: Boolean, imageSize: Dp) {
     Card(
         shape = CircleShape,
         border = BorderStroke(width = 2.dp, color = if (status) Color.Green else Color.Red),
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(16.dp).size(imageSize),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         AsyncImage(
@@ -131,11 +128,11 @@ fun ProfilePicture(pictureUrl: String, status: Boolean) {
 }
 
 @Composable
-fun ProfileContent(name: String, status: Boolean) {
+fun  ProfileContent(name: String, status: Boolean, alignement: Alignment.Horizontal) {
     Column(
         modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalAlignment = alignement
     ) {
         Text(text = name, style = MaterialTheme.typography.headlineMedium)
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
@@ -147,10 +144,40 @@ fun ProfileContent(name: String, status: Boolean) {
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun UserProfileDetailScreen(userProfile: UserProfile = userProfileList[0]) {
+    Scaffold(topBar = { AppBar() }) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it),
+            color = Color.LightGray
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
+            ) {
+                ProfilePicture(pictureUrl = userProfile.pictureUrl, status = userProfile.status, 248.dp  )
+                ProfileContent(name = userProfile.name, status = userProfile.status, Alignment.CenterHorizontally)
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun UserProfileScreen() {
+    JetpackUdemyTheme {
+        UserProfileDetailScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserListPreview() {
     JetpackUdemyTheme() {
-        MainScreen()
+        UserListScreen()
     }
 }
