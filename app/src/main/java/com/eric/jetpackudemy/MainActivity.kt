@@ -128,11 +128,11 @@ fun ProfilePicture(pictureUrl: String, status: Boolean, imageSize: Dp) {
 }
 
 @Composable
-fun  ProfileContent(name: String, status: Boolean, alignement: Alignment.Horizontal) {
+fun  ProfileContent(name: String, status: Boolean, alignment: Alignment.Horizontal) {
     Column(
         modifier = Modifier
             .padding(8.dp),
-        horizontalAlignment = alignement
+        horizontalAlignment = alignment
     ) {
         Text(text = name, style = MaterialTheme.typography.headlineMedium)
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
