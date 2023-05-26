@@ -44,6 +44,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.TopAppBar
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import org.jetbrains.annotations.Async
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +70,7 @@ fun MainScreen(userProfiles: List<UserProfile> = userProfileList) {
             color = Color.LightGray
         ) {
             LazyColumn {
-                items(userProfiles){ userProfile ->
+                items(userProfiles) { userProfile ->
                     ProfileCard(userProfile = userProfile)
                 }
             }
@@ -103,23 +106,23 @@ fun ProfileCard(userProfile: UserProfile) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            ProfilePicture(userProfile.drawableId, userProfile.status)
+            ProfilePicture(userProfile.pictureUrl, userProfile.status)
             ProfileContent(userProfile.name, userProfile.status)
         }
     }
 }
 
 @Composable
-fun ProfilePicture(drawableId: Int, status: Boolean) {
+fun ProfilePicture(pictureUrl: String, status: Boolean) {
     Card(
         shape = CircleShape,
         border = BorderStroke(width = 2.dp, color = if (status) Color.Green else Color.Red),
         modifier = Modifier.padding(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Image(
-            painter = painterResource(id = drawableId),
-            contentDescription = "blablalba",
+        AsyncImage(
+            model = pictureUrl,
+            contentDescription = "profile_pic",
             modifier = Modifier.size(72.dp),
             contentScale = ContentScale.Crop
         )
