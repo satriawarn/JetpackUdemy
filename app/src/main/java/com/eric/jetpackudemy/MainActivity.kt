@@ -41,8 +41,10 @@ import androidx.compose.ui.unit.dp
 import com.eric.jetpackudemy.ui.theme.JetpackUdemyTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.TopAppBar
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -73,7 +75,7 @@ fun UsersApplication(userProfiles: List<UserProfile> = userProfileList) {
         composable(route = "user_detail/{userId}", arguments = listOf(navArgument("userId") {
             type = NavType.IntType
         })) { navBackStackEntry ->
-            UserProfileDetailScreen(navBackStackEntry.arguments!!.getInt("userId"))
+            UserProfileDetailScreen(navBackStackEntry.arguments!!.getInt("userId"), navController )
         }
     }
 }
@@ -84,7 +86,7 @@ fun UserListScreen(
     userProfiles: List<UserProfile> = userProfileList,
     navController: NavHostController?
 ) {
-    Scaffold(topBar = { AppBar() }) {
+    Scaffold(topBar = { AppBar("Users List", Icons.Filled.Person) {} }) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
@@ -94,7 +96,7 @@ fun UserListScreen(
             LazyColumn {
                 items(userProfiles) { userProfile ->
                     ProfileCard(userProfile = userProfile) {
-                        navController?.navigate("user_detail/${userProfile.id }")
+                        navController?.navigate("user_detail/${userProfile.id}")
                     }
                 }
             }
@@ -103,12 +105,12 @@ fun UserListScreen(
 }
 
 @Composable
-fun AppBar() {
+fun AppBar(title: String, icon: ImageVector, clickAction: () -> Unit) {
     TopAppBar(
-        title = { Text("Jetpack Application") },
+        title = { Text(title) },
         navigationIcon = {
-            IconButton(onClick = { /* Do something */ }) {
-                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "BACK")
+            IconButton(onClick = { clickAction.invoke() }) {
+                Icon(imageVector = icon, contentDescription = "BACK")
             }
         }
     )
@@ -176,9 +178,13 @@ fun ProfileContent(name: String, status: Boolean, alignment: Alignment.Horizonta
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun UserProfileDetailScreen(userId: Int) {
+fun UserProfileDetailScreen(userId: Int, navController: NavHostController) {
     val userProfile = userProfileList.first { userProfile -> userId == userProfile.id }
-    Scaffold(topBar = { AppBar() }) {
+    Scaffold(topBar = {
+        AppBar(userProfile.name, Icons.Filled.ArrowBack) {
+            navController.navigateUp()
+        }
+    }) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
