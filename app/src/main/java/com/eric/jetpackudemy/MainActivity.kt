@@ -45,9 +45,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 
 class MainActivity : ComponentActivity() {
@@ -68,8 +70,10 @@ fun UsersApplication(userProfiles: List<UserProfile> = userProfileList) {
         composable("users_list") {
             UserListScreen(userProfiles, navController)
         }
-        composable("user_detail") {
-            UserProfileDetailScreen()
+        composable(route = "user_detail/{userId}", arguments = listOf(navArgument("userId") {
+            type = NavType.IntType
+        })) { navBackStackEntry ->
+            UserProfileDetailScreen(navBackStackEntry.arguments!!.getInt("userId"))
         }
     }
 }
@@ -89,8 +93,8 @@ fun UserListScreen(
         ) {
             LazyColumn {
                 items(userProfiles) { userProfile ->
-                    ProfileCard(userProfile = userProfile){
-                        navController?.navigate("user_detail")
+                    ProfileCard(userProfile = userProfile) {
+                        navController?.navigate("user_detail/${userProfile.id }")
                     }
                 }
             }
@@ -172,7 +176,8 @@ fun ProfileContent(name: String, status: Boolean, alignment: Alignment.Horizonta
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun UserProfileDetailScreen(userProfile: UserProfile = userProfileList[0]) {
+fun UserProfileDetailScreen(userId: Int) {
+    val userProfile = userProfileList.first { userProfile -> userId == userProfile.id }
     Scaffold(topBar = { AppBar() }) {
         Surface(
             modifier = Modifier
@@ -197,14 +202,6 @@ fun UserProfileDetailScreen(userProfile: UserProfile = userProfileList[0]) {
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun UserProfileScreen() {
-    JetpackUdemyTheme {
-        UserProfileDetailScreen()
     }
 }
 
