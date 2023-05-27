@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,22 +44,42 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.unit.Dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            JetpackUdemyTheme() {
-                UserListScreen()
+            JetpackUdemyTheme {
+                UsersApplication()
             }
+        }
+    }
+}
+
+@Composable
+fun UsersApplication(userProfiles: List<UserProfile> = userProfileList) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "users_list") {
+        composable("users_list") {
+            UserListScreen(userProfiles, navController)
+        }
+        composable("user_detail") {
+            UserProfileDetailScreen()
         }
     }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun UserListScreen(userProfiles: List<UserProfile> = userProfileList) {
+fun UserListScreen(
+    userProfiles: List<UserProfile> = userProfileList,
+    navController: NavHostController?
+) {
     Scaffold(topBar = { AppBar() }) {
         Surface(
             modifier = Modifier
@@ -68,7 +89,9 @@ fun UserListScreen(userProfiles: List<UserProfile> = userProfileList) {
         ) {
             LazyColumn {
                 items(userProfiles) { userProfile ->
-                    ProfileCard(userProfile = userProfile)
+                    ProfileCard(userProfile = userProfile){
+                        navController?.navigate("user_detail")
+                    }
                 }
             }
         }
@@ -88,13 +111,14 @@ fun AppBar() {
 }
 
 @Composable
-fun ProfileCard(userProfile: UserProfile) {
+fun ProfileCard(userProfile: UserProfile, clickAction: () -> Unit) {
     Card(
         shape = CutCornerShape(topEnd = 20.dp),
         modifier = Modifier
             .padding(top = 8.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
             .fillMaxWidth()
-            .wrapContentHeight(align = Alignment.Top),
+            .wrapContentHeight(align = Alignment.Top)
+            .clickable(onClick = { clickAction.invoke() }),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(Color.White)
     ) {
@@ -103,7 +127,7 @@ fun ProfileCard(userProfile: UserProfile) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            ProfilePicture(userProfile.pictureUrl, userProfile.status, 72.dp )
+            ProfilePicture(userProfile.pictureUrl, userProfile.status, 72.dp)
             ProfileContent(userProfile.name, userProfile.status, Alignment.Start)
         }
     }
@@ -114,13 +138,15 @@ fun ProfilePicture(pictureUrl: String, status: Boolean, imageSize: Dp) {
     Card(
         shape = CircleShape,
         border = BorderStroke(width = 2.dp, color = if (status) Color.Green else Color.Red),
-        modifier = Modifier.padding(16.dp).size(imageSize),
+        modifier = Modifier
+            .padding(16.dp)
+            .size(imageSize),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         AsyncImage(
             model = pictureUrl,
             contentDescription = "profile_pic",
-            modifier = Modifier.size(72.dp),
+            modifier = Modifier.size(imageSize),
             contentScale = ContentScale.Crop
         )
     }
@@ -128,7 +154,7 @@ fun ProfilePicture(pictureUrl: String, status: Boolean, imageSize: Dp) {
 }
 
 @Composable
-fun  ProfileContent(name: String, status: Boolean, alignment: Alignment.Horizontal) {
+fun ProfileContent(name: String, status: Boolean, alignment: Alignment.Horizontal) {
     Column(
         modifier = Modifier
             .padding(8.dp),
@@ -159,8 +185,16 @@ fun UserProfileDetailScreen(userProfile: UserProfile = userProfileList[0]) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top,
             ) {
-                ProfilePicture(pictureUrl = userProfile.pictureUrl, status = userProfile.status, 248.dp  )
-                ProfileContent(name = userProfile.name, status = userProfile.status, Alignment.CenterHorizontally)
+                ProfilePicture(
+                    pictureUrl = userProfile.pictureUrl,
+                    status = userProfile.status,
+                    248.dp
+                )
+                ProfileContent(
+                    name = userProfile.name,
+                    status = userProfile.status,
+                    Alignment.CenterHorizontally
+                )
             }
         }
     }
@@ -178,6 +212,6 @@ fun UserProfileScreen() {
 @Composable
 fun UserListPreview() {
     JetpackUdemyTheme() {
-        UserListScreen()
+        UserListScreen(userProfiles = userProfileList, null)
     }
 }
