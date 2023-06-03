@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -31,9 +34,12 @@ import java.lang.Float.min
 
 @Composable
 fun MealDetailScreen(meal: MealsResponse?) {
-    val scrollState = rememberScrollState()
-    val offSet = min(1f, 1 - (scrollState.value / 600f))
-    val size by animateDpAsState(targetValue = max(100.dp, 200.dp * offSet))
+    val scrollState = rememberLazyListState()
+    val offSet = min(
+        1f,
+        1 - (scrollState.firstVisibleItemScrollOffset / 600f + scrollState.firstVisibleItemIndex)
+    )
+    val size by animateDpAsState(targetValue = max(100.dp, 140.dp * offSet))
 
     Surface(color = MaterialTheme.colorScheme.background) {
         Column {
@@ -49,7 +55,8 @@ fun MealDetailScreen(meal: MealsResponse?) {
                             contentDescription = null,
                             modifier = Modifier
                                 .size(size)
-                                .clip(CircleShape))
+                                .clip(CircleShape)
+                        )
                     }
                     Text(
                         modifier = Modifier
@@ -61,30 +68,11 @@ fun MealDetailScreen(meal: MealsResponse?) {
                 }
             }
 
-            Column(modifier = Modifier
-                .verticalScroll(scrollState)
-                .fillMaxWidth()) {
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
-                Text(text = "asdasdasda", modifier = Modifier.padding(16.dp))
+            val dummyContentList = (0..100).map { it.toString() }
+            LazyColumn(state = scrollState, modifier = Modifier.fillMaxWidth()) {
+                items(dummyContentList) { dummyItem ->
+                    Text(text = dummyItem, modifier = Modifier.padding(24.dp))
+                }
             }
         }
 
