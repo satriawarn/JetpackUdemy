@@ -9,7 +9,7 @@ import com.eric.jetpackudemy.model.response.MealsResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MealsCategoriesViewModel(private val repository: MealsRepository = MealsRepository()) :
+class MealsCategoriesViewModel(private val repository: MealsRepository = MealsRepository.getInstance()) :
     ViewModel() {
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -17,6 +17,7 @@ class MealsCategoriesViewModel(private val repository: MealsRepository = MealsRe
             mealsState.value = meals
         }
     }
+
     val mealsState: MutableState<List<MealsResponse>> = mutableStateOf(emptyList())
 
     private suspend fun getMeals(): List<MealsResponse> {

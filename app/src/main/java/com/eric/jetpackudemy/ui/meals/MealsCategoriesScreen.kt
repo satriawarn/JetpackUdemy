@@ -36,18 +36,18 @@ import com.eric.jetpackudemy.ui.theme.JetpackUdemyTheme
 import androidx.compose.runtime.*
 
 @Composable
-fun MealsCategoriesScreen() {
+fun MealsCategoriesScreen(navigationCallback: (String) -> Unit) {
     val viewModel: MealsCategoriesViewModel = viewModel()
     val meals = viewModel.mealsState.value
     LazyColumn(contentPadding = PaddingValues(16.dp)) {
         items(meals) { meals ->
-            MealCategory(meal = meals)
+            MealCategory(meal = meals, navigationCallback)
         }
     }
 }
 
 @Composable
-fun MealCategory(meal: MealsResponse) {
+fun MealCategory(meal: MealsResponse, navigationCallback: (String) -> Unit) {
     var isExpanded by remember {
         mutableStateOf(false)
     }
@@ -56,10 +56,12 @@ fun MealCategory(meal: MealsResponse) {
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
         ),
-
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp)
+            .clickable {
+                navigationCallback(meal.id)
+            }
     ) {
         Row(modifier = Modifier.animateContentSize()) {
             Image(
@@ -99,13 +101,5 @@ fun MealCategory(meal: MealsResponse) {
             )
         }
 
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    JetpackUdemyTheme {
-        MealsCategoriesScreen()
     }
 }
